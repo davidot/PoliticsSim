@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class Main {
+public class LowerChambers {
 
     public static final int NUM_MP = 150;
     public static final int SPEAKERS_PER_SIDE = 10;
@@ -16,7 +16,7 @@ public class Main {
     private final List<MP> spoken = new ArrayList<>(SPEAKERS_PER_SIDE * 2);
 
 
-    public Main() {
+    public LowerChambers() {
         Random rand = new Random();
         //initialize the mps
         for(int i = 0; i < NUM_MP; i++) {
@@ -106,6 +106,6 @@ public class Main {
 
 
     public static void main(String[] args) {
-        new Main().start();
+        new LowerChambers().start();
     }
 }

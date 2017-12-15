@@ -9,6 +9,7 @@ public class MP {
 
     private int opinion;
     private final int speechSkill;
+    //todo add stubbornness
 
     public MP(int opinion, int speechSkill) {
         this.opinion = opinion;
@@ -39,11 +40,6 @@ public class MP {
             return VoteOptions.PRO;
         }
         return VoteOptions.AGAINST;
-    }
-
-    public int getSpeechTotal() {
-        //todo add better formula
-        return getAbsoluteOpinion() * speechSkill;
     }
 
     public void listen(int speech) {

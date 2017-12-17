@@ -7,11 +7,14 @@ public class MP {
 
     public static final int SPEECH_MAX = 100;
 
+    //todo choose value
+    private static final int SPEECH_CONSTANT = 9;
+
     private int opinion;
     private final int speechSkill;
-    //todo add stubbornness
+    private final double stubbornness;
 
-    public MP(int opinion, int speechSkill) {
+    public MP(int opinion, int speechSkill, double stubbornness) {
         this.opinion = opinion;
         checkOpinionBounds();
 
@@ -22,6 +25,15 @@ public class MP {
         } else {
             this.speechSkill = speechSkill;
         }
+
+        if (stubbornness < 0.0) {
+            this.stubbornness = 0.0;
+        } else if (stubbornness > 1.0) {
+            this.stubbornness = 1.0;
+        } else {
+            this.stubbornness = stubbornness;
+        }
+
     }
 
     private void checkOpinionBounds() {
@@ -43,14 +55,10 @@ public class MP {
     }
 
     public void listen(int speech) {
-        //todo implements cost function
-        int influence = speech;
         int absoluteOpinion = getAbsoluteOpinion();
-        if (absoluteOpinion > (3 * OPINION_MAX / 4)) {
-            influence /= 3;
-        } else if (absoluteOpinion > OPINION_MAX / 2) {
-            influence /= 2;
-        }
+        //todo implements cost function
+        int influence = (int) (2 * stubbornness * speech * (OPINION_MAX - absoluteOpinion) /
+                        (2*absoluteOpinion + OPINION_MAX));
         opinion += influence;
         checkOpinionBounds();
     }
@@ -60,7 +68,15 @@ public class MP {
     }
 
     public int speak() {
-        //todo add better formula
-        return getAbsoluteOpinion() / 100 + speechSkill * 10;
+        if (getAbsoluteOpinion() > OPINION_MAX / 2) {
+            return speechSkill * SPEECH_CONSTANT;
+        } else {
+            return (int)(calcSpeedMod() * speechSkill * SPEECH_CONSTANT);
+        }
+    }
+
+    private double calcSpeedMod() {
+        //todo implement curve
+        return 0.5;
     }
 }

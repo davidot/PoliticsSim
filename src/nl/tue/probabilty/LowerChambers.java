@@ -11,14 +11,19 @@ public class LowerChambers {
     public static final VoteOptions START_SIDE = VoteOptions.PRO;
     public static final VoteOptions SECOND_SIDE = START_SIDE.otherSide();
 
-    private final MP[] mps = new MP[NUM_MP];
+    private final MP[] mps;
 
     private final List<MP> spoken = new ArrayList<>(SPEAKERS_PER_SIDE * 2);
 
 
+    public LowerChambers(Setup setup, int run) {
+        mps = setup.generateMPs(run);
+    }
+
     public LowerChambers() {
         Random rand = new Random();
         //initialize the mps
+        mps = new MP[NUM_MP];
         for(int i = 0; i < NUM_MP; i++) {
             mps[i] = new MP(rand.nextInt(MP.OPINION_MAX/2) - MP.OPINION_MAX/4 - 1, rand.nextInt(5));
         }
@@ -30,17 +35,19 @@ public class LowerChambers {
     private void start() {
         //play out the rounds
         for(int i = 0; i < SPEAKERS_PER_SIDE; i++) {
-            MP mp = getBestSpeaker(START_SIDE);
-            speakToOthers(mp);
-
-            mp = getBestSpeaker(SECOND_SIDE);
-            speakToOthers(mp);
-            // System.out.println("After speaking " + i);
-            // printVoteResult();
+            runRound();
         }
 
         System.out.println("Final result:");
         printVoteResult();
+    }
+
+    public void runRound() {
+        MP mp = getBestSpeaker(START_SIDE);
+        speakToOthers(mp);
+
+        mp = getBestSpeaker(SECOND_SIDE);
+        speakToOthers(mp);
     }
 
     private void speakToOthers(MP mp) {
@@ -53,8 +60,6 @@ public class LowerChambers {
                     mps[j].listen(influence);
                 }
             }
-        } else {
-            System.out.println("No one left to speak");
         }
     }
 
@@ -104,8 +109,15 @@ public class LowerChambers {
 
     }
 
+    public int[] resultsFromVote() {
+        int[] results = new int[Results.DATA_PER_ROUND];
+        for (int i = 0; i < NUM_MP; i++) {
+            results[mps[i].vote().ordinal()]++;
+        }
+        return results;
+    }
 
     public static void main(String[] args) {
-        new LowerChambers().start();
+        new Results().runAll();
     }
 }

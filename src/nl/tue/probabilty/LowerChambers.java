@@ -119,6 +119,7 @@ public class LowerChambers {
     }
 
     public static void main(String[] args) {
-        new Results().runAll();
+        new Results(Setup.getStubbornMinority(75, 300.0, 50.0, 0.8, -500, 100, 1.0))
+                .runAll();
     }
 }

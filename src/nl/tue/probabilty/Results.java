@@ -15,7 +15,7 @@ public class Results {
     private VoteOptions[][] finalVotes;
 
     public Results() {
-        this(new Setup());
+        this(Setup.getDefault());
     }
 
     public Results(Setup setup) {
@@ -160,10 +160,10 @@ public class Results {
 
     private void valuesToCSV(double[][] values) {
         for (int vote = 0; vote < DATA_PER_ROUND; vote++) {
-            StringBuilder builder = new StringBuilder(VoteOptions.values()[vote].name() + ":");
+            StringBuilder builder = new StringBuilder(VoteOptions.values()[vote].getName() + ":");
 
             for (int i = 0; i < TOTAL_MEASURE_POINTS; i++) {
-                builder.append(";").append(Double.toString(values[vote][i]).replace(".", ","));
+                builder.append(";").append(String.format("%10.2f", values[vote][i]));
             }
             //print median to out
             System.out.println(builder.toString());
@@ -172,10 +172,10 @@ public class Results {
 
     private void runPartToCSV(int[][] values) {
         for (int vote = 0; vote < DATA_PER_ROUND; vote++) {
-            StringBuilder builder = new StringBuilder(VoteOptions.values()[vote].name() + ":");
+            StringBuilder builder = new StringBuilder(VoteOptions.values()[vote].getName() + ":");
 
             for (int i = 0; i < TOTAL_MEASURE_POINTS; i++) {
-                builder.append(";").append(values[vote][i]).append(" / ").append(runs);
+                builder.append(";").append(String.format("%6d", values[vote][i]));
             }
             //print median to out
             System.out.println(builder.toString());

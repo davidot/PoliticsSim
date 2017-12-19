@@ -25,4 +25,12 @@ public enum VoteOptions {
         //neutral should not have any influence since they should not be speaking
         return 0;
     }
+
+    public String getName() {
+        StringBuilder name = new StringBuilder(name());
+        while (name.length() < 7) {
+            name.append(" ");
+        }
+        return name.toString();
+    }
 }

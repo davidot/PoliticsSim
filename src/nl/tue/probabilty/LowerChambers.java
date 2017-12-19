@@ -110,12 +110,12 @@ public class LowerChambers {
 
     }
 
-    public int[] resultsFromVote() {
+    public Results.RoundResult getCurrentResult() {
         int[] results = new int[Results.DATA_PER_ROUND];
         for (int i = 0; i < NUM_MP; i++) {
             results[mps[i].vote().ordinal()]++;
         }
-        return results;
+        return new Results.RoundResult(results);
     }
 
     public static void main(String[] args) {

@@ -12,6 +12,7 @@ public class Results {
     private final int runs;
     private final Setup setup;
     private int[][][] data;
+    private VoteOptions[][] finalVotes;
 
     public Results() {
         this(new Setup());
@@ -32,16 +33,21 @@ public class Results {
 
     private void createStorage() {
         data = new int[runs][TOTAL_MEASURE_POINTS][DATA_PER_ROUND];
+        finalVotes = new VoteOptions[runs][TOTAL_MEASURE_POINTS];
     }
 
     private void executeRun(int run) {
         LowerChambers lc = new LowerChambers(setup, run);
         //get initial vote
-        data[run][0] = lc.resultsFromVote();
+        RoundResult result = lc.getCurrentResult();
+        data[run][0] = result.getVotes();
+        finalVotes[run][0] = result.getTotalVote();
         for (int i = 1; i < TOTAL_MEASURE_POINTS; i++) {
             lc.runRound();
             //collect vote after each round of discussion
-            data[run][i] = lc.resultsFromVote();
+            result = lc.getCurrentResult();
+            data[run][i] = result.getVotes();
+            finalVotes[run][i] = result.getTotalVote();
 //            System.out.println("Result for run " + run + ", round= " + i + " : "
 //                    + Arrays.toString(data[run][i]));
         }
@@ -61,6 +67,8 @@ public class Results {
 
     private void analyzeResults() {
         double[][] medians = new double[DATA_PER_ROUND][TOTAL_MEASURE_POINTS];
+        double[][] q1s = new double[DATA_PER_ROUND][TOTAL_MEASURE_POINTS];
+        double[][] q3s = new double[DATA_PER_ROUND][TOTAL_MEASURE_POINTS];
 
         double[][] means = new double[DATA_PER_ROUND][TOTAL_MEASURE_POINTS];
         double[][] mins = new double[DATA_PER_ROUND][TOTAL_MEASURE_POINTS];
@@ -76,19 +84,28 @@ public class Results {
                 values.sort(Integer::compareTo);
 
                 double median;
+                double q1;
+                double q3;
 
                 int vSize = values.size();
+                int hSize = vSize / 2;
+                int qSize = vSize / 4;
                 if (vSize % 2 == 0) {
                     //even size pick average of two middle elements
-                    median = (values.get(vSize / 2) + values.get(vSize / 2 + 1)) / 2.0;
+                    median = (values.get(hSize) + values.get(hSize + 1)) / 2.0;
+                    q1 = (values.get(qSize) + values.get(qSize - 1)) / 2.0;
+                    q3 = (values.get(vSize - qSize) + values.get(vSize - qSize - 1)) / 2.0;
                 } else {
                     //uneven size just pick the middle one
-                    median = values.get(vSize / 2);
-
+                    median = values.get(hSize);
+                    q1 = (values.get(qSize) + values.get(qSize - 1)) / 2.0;
+                    q3 = (values.get(vSize - qSize) + values.get(vSize - qSize - 1)) / 2.0;
                 }
                 //put the median in
-                System.out.println("Median for round " + i + " datapoint " + j + " == " + median);
+//                System.out.println("Median for round " + i + " datapoint " + j + " == " + median);
                 medians[j][i] = median;
+                q1s[j][i] = q1;
+                q3s[j][i] = q3;
 
                 DoubleSummaryStatistics dss = values.stream().mapToDouble(a -> a).summaryStatistics();
                 //calculate mean
@@ -113,6 +130,12 @@ public class Results {
 
         System.out.println("\nMaxs\n");
         valuesToCSV(maxs);
+
+        System.out.println("\nQ1\n");
+        valuesToCSV(q1s);
+
+        System.out.println("\nQ3\n");
+        valuesToCSV(q3s);
     }
 
     private void valuesToCSV(double[][] values) {
@@ -124,6 +147,30 @@ public class Results {
             }
             //print median to out
             System.out.println(builder.toString());
+        }
+    }
+
+    public static class RoundResult {
+        private final int[] votes;
+        private final VoteOptions totalVote;
+
+        public RoundResult(int[] votes) {
+            this.votes = votes;
+            if (votes[VoteOptions.PRO.ordinal()] > votes[VoteOptions.AGAINST.ordinal()]) {
+                totalVote = VoteOptions.PRO;
+            } else if (votes[VoteOptions.PRO.ordinal()] < votes[VoteOptions.AGAINST.ordinal()]) {
+                totalVote = VoteOptions.AGAINST;
+            } else {
+                totalVote = VoteOptions.NEUTRAL;
+            }
+        }
+
+        public int[] getVotes() {
+            return votes;
+        }
+
+        public VoteOptions getTotalVote() {
+            return totalVote;
         }
     }
 

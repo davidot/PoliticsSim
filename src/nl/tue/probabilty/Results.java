@@ -73,7 +73,16 @@ public class Results {
         double[][] means = new double[DATA_PER_ROUND][TOTAL_MEASURE_POINTS];
         double[][] mins = new double[DATA_PER_ROUND][TOTAL_MEASURE_POINTS];
         double[][] maxs = new double[DATA_PER_ROUND][TOTAL_MEASURE_POINTS];
+
+        int[][] finalVotesCount = new int[DATA_PER_ROUND][TOTAL_MEASURE_POINTS];
+        double[][] finalPercentage = new double[DATA_PER_ROUND][TOTAL_MEASURE_POINTS];
+
         for (int i = 0; i < TOTAL_MEASURE_POINTS; i++) {
+
+            for (int k = 0; k < runs; k++) {
+                //increment the winning vote option from run k in round i
+                finalVotesCount[finalVotes[k][i].ordinal()][i]++;
+            }
             for (int j = 0; j < DATA_PER_ROUND; j++) {
                 List<Integer> values = new ArrayList<>(runs);
                 for (int k = 0; k < runs; k++) {
@@ -113,7 +122,12 @@ public class Results {
                 means[j][i] = dss.getAverage();
                 maxs[j][i] = dss.getMax();
                 mins[j][i] = dss.getMin();
+            }
+        }
 
+        for (int i = 0; i < finalVotesCount.length; i++) {
+            for (int j = 0; j < finalVotesCount[i].length; j++) {
+                finalPercentage[i][j] = finalVotesCount[i][j] / (double) runs;
             }
         }
 
@@ -136,6 +150,12 @@ public class Results {
 
         System.out.println("\nQ3\n");
         valuesToCSV(q3s);
+
+        System.out.println("\nWINS\n");
+        runPartToCSV(finalVotesCount);
+
+        System.out.println("\n% WINS\n");
+        valuesToCSV(finalPercentage);
     }
 
     private void valuesToCSV(double[][] values) {
@@ -144,6 +164,18 @@ public class Results {
 
             for (int i = 0; i < TOTAL_MEASURE_POINTS; i++) {
                 builder.append(";").append(Double.toString(values[vote][i]).replace(".", ","));
+            }
+            //print median to out
+            System.out.println(builder.toString());
+        }
+    }
+
+    private void runPartToCSV(int[][] values) {
+        for (int vote = 0; vote < DATA_PER_ROUND; vote++) {
+            StringBuilder builder = new StringBuilder(VoteOptions.values()[vote].name() + ":");
+
+            for (int i = 0; i < TOTAL_MEASURE_POINTS; i++) {
+                builder.append(";").append(values[vote][i]).append(" / ").append(runs);
             }
             //print median to out
             System.out.println(builder.toString());

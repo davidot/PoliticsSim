@@ -3,6 +3,7 @@ package nl.tue.probabilty;
 public class MP {
 
     public static final int OPINION_MAX = 1000;
+    public static final double OPINION_DIV = OPINION_MAX / 10.0;
     public static final int NEUTRAL_MAX = 100;
 
     public static final int SPEECH_MAX = 100;
@@ -70,11 +71,11 @@ public class MP {
         if (getAbsoluteOpinion() > OPINION_MAX / 2) {
             return speechSkill * SPEECH_CONSTANT;
         } else {
-            return (int)(calcSpeedMod() * speechSkill * SPEECH_CONSTANT);
+            return (int)(calcSpeechMod() * speechSkill * SPEECH_CONSTANT);
         }
     }
 
-    private double calcSpeedMod() {
-        return 1/(1+ Math.exp(-(getAbsoluteOpinion() / (OPINION_MAX / 10) + 1)));
+    private double calcSpeechMod() {
+        return 1/(1+ 100*Math.exp(-(getAbsoluteOpinion() / (OPINION_DIV * 2))));
     }
 }

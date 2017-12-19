@@ -8,7 +8,7 @@ public class MP {
     public static final int SPEECH_MAX = 100;
 
     //todo choose value
-    private static final int SPEECH_CONSTANT = 9;
+    private static final int SPEECH_CONSTANT = 90;
 
     private int opinion;
     private final int speechSkill;
@@ -18,8 +18,8 @@ public class MP {
         this.opinion = opinion;
         checkOpinionBounds();
 
-        if (speechSkill < 0) {
-            this.speechSkill = 0;
+        if (speechSkill < 1) {
+            this.speechSkill = 1;
         } else if (speechSkill > SPEECH_MAX) {
             this.speechSkill = SPEECH_MAX;
         } else {
@@ -56,7 +56,6 @@ public class MP {
 
     public void listen(int speech) {
         int absoluteOpinion = getAbsoluteOpinion();
-        //todo implements cost function
         int influence = (int) (2 * stubbornness * speech * (OPINION_MAX - absoluteOpinion) /
                         (2*absoluteOpinion + OPINION_MAX));
         opinion += influence;
@@ -76,7 +75,6 @@ public class MP {
     }
 
     private double calcSpeedMod() {
-        //todo implement curve
-        return 0.5;
+        return 1/(1+ Math.exp(-(getAbsoluteOpinion() / (OPINION_MAX / 10) + 1)));
     }
 }

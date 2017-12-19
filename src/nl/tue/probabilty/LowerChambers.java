@@ -25,7 +25,8 @@ public class LowerChambers {
         //initialize the mps
         mps = new MP[NUM_MP];
         for(int i = 0; i < NUM_MP; i++) {
-            mps[i] = new MP(rand.nextInt(MP.OPINION_MAX/2) - MP.OPINION_MAX/4 - 1, rand.nextInt(5));
+            mps[i] = new MP(rand.nextInt(MP.OPINION_MAX/2) - MP.OPINION_MAX/4 - 1, rand.nextInt
+                    (5) + 1, 1.0);
         }
 
         System.out.println("Initial setup state:");

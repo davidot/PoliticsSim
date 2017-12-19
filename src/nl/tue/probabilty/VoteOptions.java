@@ -2,8 +2,8 @@ package nl.tue.probabilty;
 
 public enum VoteOptions {
     PRO,
-    NEUTRAL,
-    AGAINST;
+    AGAINST,
+    NEUTRAL;
 
     public VoteOptions otherSide() {
         switch (this) {

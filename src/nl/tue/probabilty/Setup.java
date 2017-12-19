@@ -6,16 +6,17 @@ public class Setup {
 
     public MP[] generateMPs(int run) {
         MP[] mps = new MP[LowerChambers.NUM_MP];
-        for (int i = 0; i < LowerChambers.NUM_MP; i++) {
-            mps[i] = new MP(0,0, 0.0);
-        }
         Random rand = new Random();
+        NormalDistribution normalOpinionDist = new NormalDistribution(rand.nextLong(), 0.0,
+                800.0);
 
-
+        for (int i = 0; i < LowerChambers.NUM_MP; i++) {
+            mps[i] = new MP(normalOpinionDist.nextIntValue(),1, 1.0);
+        }
         return mps;
     }
 
-    private static class NormalDistribution {
+    public static class NormalDistribution {
 
         private Random rand;
         private final double mean;
@@ -27,20 +28,24 @@ public class Setup {
             this.variance = variance;
         }
 
-        private NormalDistribution(long seed, double mean, double variance) {
+        public NormalDistribution(long seed, double mean, double variance) {
             this.rand = new Random(seed);
             this.mean = mean;
             this.variance = variance;
         }
 
-        private double nextValue() {
+        public double nextValue() {
             //next normal value with mean and variance
             return rand.nextGaussian() * variance + mean;
         }
 
+        public int nextIntValue() {
+            return (int) nextValue();
+        }
+
     }
 
-    private static class UniformIntDistribution {
+    public static class UniformIntDistribution {
 
         private Random rand;
         private final int min;

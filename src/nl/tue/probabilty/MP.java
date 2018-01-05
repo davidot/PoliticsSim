@@ -57,7 +57,7 @@ public class MP {
 
     public void listen(int speech) {
         int absoluteOpinion = getAbsoluteOpinion();
-        int influence = (int) (2 * stubbornness * speech * (OPINION_MAX - absoluteOpinion) /
+        int influence = (int) (stubbornness * 2  * speech * (OPINION_MAX - absoluteOpinion) /
                         (2*absoluteOpinion + OPINION_MAX));
         opinion += influence;
         checkOpinionBounds();
@@ -76,6 +76,7 @@ public class MP {
     }
 
     private double calcSpeechMod() {
-        return 1/(1+ 100*Math.exp(-(getAbsoluteOpinion() / (OPINION_DIV * 2))));
+        double v = (getAbsoluteOpinion()) / 750.0;
+        return 27.0/4.0 * (v * v * ( 1- v));
     }
 }

@@ -8,8 +8,8 @@ public class LowerChambers {
 
     public static final int NUM_MP = 150;
     public static final int SPEAKERS_PER_SIDE = 10;
-    public static final VoteOptions START_SIDE = VoteOptions.PRO;
-    public static final VoteOptions SECOND_SIDE = START_SIDE.otherSide();
+    private static VoteOptions startSide = VoteOptions.PRO;
+    private static VoteOptions secondSide = startSide.otherSide();
 
     private final MP[] mps;
 
@@ -44,10 +44,10 @@ public class LowerChambers {
     }
 
     public void runRound() {
-        MP mp = getBestSpeaker(START_SIDE);
+        MP mp = getBestSpeaker(startSide);
         speakToOthers(mp);
 
-        mp = getBestSpeaker(SECOND_SIDE);
+        mp = getBestSpeaker(secondSide);
         speakToOthers(mp);
     }
 
@@ -118,8 +118,18 @@ public class LowerChambers {
         return new Results.RoundResult(results);
     }
 
+    public static void setStartSide(VoteOptions start) {
+        startSide = start;
+        secondSide = start.otherSide();
+    }
+
     public static void main(String[] args) {
-        new Results(Setup.getStubbornMinority(75, 300.0, 50.0, 0.8, -500, 100, 1.0))
-                .runAll();
+        // new Results(Setup.getStubbornMinority(75, 300.0, 50.0, 0.8, -500, 100, 1.0))
+        //         .runAll();
+        // new Results(Setup.getDefaultConsistency()).runBothToFile("consistency");
+        for(int i = 0; i < 25; i++) {
+            new Results(Setup.getRootNTest(i,0, 1.0)).runBothToFile("root-n-" + i + "-pro-");
+            // new Results(Setup.getRootNTest(0,i, 1.0)).runBothToFile("root-n-" + i + "-aga-");
+        }
     }
 }

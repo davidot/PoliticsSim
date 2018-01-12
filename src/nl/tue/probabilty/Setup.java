@@ -17,6 +17,21 @@ public abstract class Setup {
         };
     }
 
+    public static Setup getDefaultConsistency() {
+        return new Setup() {
+            @Override
+            public MP[] generateMPs(int run) {
+                MP[] mps = new MP[LowerChambers.NUM_MP];
+                for (int i = 0; i < LowerChambers.NUM_MP; i+= 3) {
+                    mps[i] = new MP(500, 1, 1.0);
+                    mps[i + 1] = new MP(0, 1, 1.0);
+                    mps[i + 2] = new MP(-500, 1, 1.0);
+                }
+                return mps;
+            }
+        };
+    }
+
     public abstract MP[] generateMPs(int run);
 
 
@@ -29,7 +44,7 @@ public abstract class Setup {
 
         private final int minoritySize;
 
-        private final double meanMaj;
+        private final double meanMax;
         private final double varMaj;
         private final double meanMin;
         private final double varMin;
@@ -43,7 +58,7 @@ public abstract class Setup {
                 throw new IllegalArgumentException("Split must be between 0 and 150");
             }
             this.minoritySize = minoritySize;
-            this.meanMaj = meanMaj;
+            this.meanMax = meanMaj;
             this.varMaj = varMaj;
             this.meanMin = meanMin;
             this.varMin = varMin;
@@ -55,7 +70,7 @@ public abstract class Setup {
         public MP[] generateMPs(int run) {
             MP[] mps = new MP[LowerChambers.NUM_MP];
             Random rand = new Random();
-            NormalDistribution normalMaj = new NormalDistribution(rand.nextLong(), meanMaj, varMaj);
+            NormalDistribution normalMaj = new NormalDistribution(rand.nextLong(), meanMax, varMaj);
             NormalDistribution normalMin = new NormalDistribution(rand.nextLong(), meanMin, varMin);
 
             for (int i = 0; i < minoritySize; i++) {
@@ -103,11 +118,50 @@ public abstract class Setup {
     }
 
 
+    public static Setup getRootNTest(int pro, int against, double stubborn) {
+        return new RootNTestSetup(pro, against, stubborn);
+    }
+
+    private static class RootNTestSetup extends Setup {
+        private final int pro;
+        private final int against;
+        private final double stubborn;
+
+        public RootNTestSetup(int pro, int against, double stubborn) {
+            this.pro = pro;
+            this.against = against;
+            this.stubborn = stubborn;
+        }
+
+        @Override
+        public MP[] generateMPs(int run) {
+            MP[] mps = new MP[LowerChambers.NUM_MP];
+            Random rand = new Random();
+            NormalDistribution proOpinionDist = new NormalDistribution(rand.nextLong(), 750, 50);
+            NormalDistribution neutralOpinionDist = new NormalDistribution(rand.nextLong(), 0, 250);
+            NormalDistribution againstOpinionDist = new NormalDistribution(rand.nextLong(), 750, 50);
+
+            for (int i = 0; i < pro; i++) {
+                mps[i] = new MP(proOpinionDist.nextIntValue(), 1, stubborn);
+            }
+
+            for (int i = pro; i < pro + against; i++) {
+                mps[i] = new MP(againstOpinionDist.nextIntValue(), 1, stubborn);
+            }
+
+            for (int i = pro + against; i < LowerChambers.NUM_MP; i++) {
+                mps[i] = new MP(neutralOpinionDist.nextIntValue(), 1, stubborn);
+            }
+
+            return mps;
+        }
+    }
 
     public static class NormalDistribution {
 
         private Random rand;
         private final double mean;
+
         private final double variance;
 
         public NormalDistribution(double mean, double variance) {
@@ -132,11 +186,11 @@ public abstract class Setup {
         }
 
     }
-
     public static class UniformIntDistribution {
 
         private Random rand;
         private final int min;
+
         private final int spread;
 
         public UniformIntDistribution(int min, int max) {
@@ -157,5 +211,4 @@ public abstract class Setup {
         }
 
     }
-
 }

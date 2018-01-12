@@ -1,6 +1,13 @@
 package nl.tue.probabilty;
 
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.DoubleSummaryStatistics;
+import java.util.List;
 
 public class Results {
 
@@ -62,10 +69,52 @@ public class Results {
             }
         }
         System.out.println("\n\n\n");
-        analyzeResults();
+        System.out.println(analyzeResults());
     }
 
-    private void analyzeResults() {
+    public void runBothToFile(String name) {
+        int file = -1;
+        String fileName = "poli-run-" + name;
+        while(new File(fileName + "pro.txt").exists() && ++file < 100) {
+            fileName = "poli-run-" + name + "-run-" + file;
+        }
+
+        LowerChambers.setStartSide(VoteOptions.PRO);
+        for (int i = 0; i < runs; i++) {
+            executeRun(i);
+            if (i % 1000 == 0) {
+                System.out.println("Did " + i + " runs PRO");
+            }
+        }
+
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName + "pro.txt"))) {
+            writer.write(analyzeResults());
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+
+
+        //empty data
+        createStorage();
+        LowerChambers.setStartSide(VoteOptions.AGAINST);
+        for (int i = 0; i < runs; i++) {
+            executeRun(i);
+            if (i % 1000 == 0) {
+                System.out.println("Did " + i + " runs AGAINST");
+            }
+        }
+
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName + "against.txt"))) {
+            writer.write(analyzeResults());
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+
+
+        System.out.println("Saved to " + fileName + "[PRO|AGAINST].txt");
+    }
+
+    private String analyzeResults() {
         double[][] medians = new double[DATA_PER_ROUND][TOTAL_MEASURE_POINTS];
         double[][] q1s = new double[DATA_PER_ROUND][TOTAL_MEASURE_POINTS];
         double[][] q3s = new double[DATA_PER_ROUND][TOTAL_MEASURE_POINTS];
@@ -133,53 +182,59 @@ public class Results {
 
         //output as csv for now
 
-        System.out.println("Means\n");
-        valuesToCSV(means);
+        StringBuilder mainBuilder = new StringBuilder("Means\n\n");
+        mainBuilder.append(valuesToCSV(means));
 
-        System.out.println("\nMedians\n");
-        valuesToCSV(medians);
+        mainBuilder.append("\nMedians\n");
+        mainBuilder.append(valuesToCSV(medians));
 
-        System.out.println("\nMins\n");
-        valuesToCSV(mins);
+        mainBuilder.append("\nMins\n");
+        mainBuilder.append(valuesToCSV(mins));
 
-        System.out.println("\nMaxs\n");
-        valuesToCSV(maxs);
+        mainBuilder.append("\nMaxs\n");
+        mainBuilder.append(valuesToCSV(maxs));
 
-        System.out.println("\nQ1\n");
-        valuesToCSV(q1s);
+        mainBuilder.append("\nQ1\n");
+        mainBuilder.append(valuesToCSV(q1s));
 
-        System.out.println("\nQ3\n");
-        valuesToCSV(q3s);
+        mainBuilder.append("\nQ3\n");
+        mainBuilder.append(valuesToCSV(q3s));
 
-        System.out.println("\nWINS\n");
-        runPartToCSV(finalVotesCount);
+        mainBuilder.append("\nWINS\n");
+        mainBuilder.append(runPartToCSV(finalVotesCount));
 
-        System.out.println("\n% WINS\n");
-        valuesToCSV(finalPercentage);
+        mainBuilder.append("\n% WINS\n");
+        mainBuilder.append(valuesToCSV(finalPercentage));
+
+        return  mainBuilder.toString();
     }
 
-    private void valuesToCSV(double[][] values) {
+    private String valuesToCSV(double[][] values) {
+        StringBuilder builder = new StringBuilder();
         for (int vote = 0; vote < DATA_PER_ROUND; vote++) {
-            StringBuilder builder = new StringBuilder(VoteOptions.values()[vote].getName() + ":");
+            builder.append(VoteOptions.values()[vote].getName()).append(":");
 
             for (int i = 0; i < TOTAL_MEASURE_POINTS; i++) {
                 builder.append(";").append(String.format("%10.2f", values[vote][i]));
             }
             //print median to out
-            System.out.println(builder.toString());
+            builder.append("\n");
         }
+        return builder.toString();
     }
 
-    private void runPartToCSV(int[][] values) {
+    private String runPartToCSV(int[][] values) {
+        StringBuilder builder = new StringBuilder();
         for (int vote = 0; vote < DATA_PER_ROUND; vote++) {
-            StringBuilder builder = new StringBuilder(VoteOptions.values()[vote].getName() + ":");
+            builder.append(VoteOptions.values()[vote].getName()).append(":");
 
             for (int i = 0; i < TOTAL_MEASURE_POINTS; i++) {
                 builder.append(";").append(String.format("%6d", values[vote][i]));
             }
             //print median to out
-            System.out.println(builder.toString());
+            builder.append("\n");
         }
+        return builder.toString();
     }
 
     public static class RoundResult {

@@ -9,8 +9,11 @@ public abstract class Setup {
             @Override
             public MP[] generateMPs(int run) {
                 MP[] mps = new MP[LowerChambers.NUM_MP];
+                Random rand = new Random();
+                NormalDistribution neutralOpinionDist = new NormalDistribution(rand.nextLong(), 0,
+                        1000);
                 for (int i = 0; i < LowerChambers.NUM_MP; i++) {
-                    mps[i] = new MP(0, 1, 1.0);
+                    mps[i] = new MP(neutralOpinionDist.nextIntValue(), 1, 1.0);
                 }
                 return mps;
             }
@@ -137,9 +140,11 @@ public abstract class Setup {
         public MP[] generateMPs(int run) {
             MP[] mps = new MP[LowerChambers.NUM_MP];
             Random rand = new Random();
-            NormalDistribution proOpinionDist = new NormalDistribution(rand.nextLong(), 750, 50);
-            NormalDistribution neutralOpinionDist = new NormalDistribution(rand.nextLong(), 0, 250);
-            NormalDistribution againstOpinionDist = new NormalDistribution(rand.nextLong(), 750, 50);
+            NormalDistribution proOpinionDist = new NormalDistribution(rand.nextLong(), 500, 50);
+            NormalDistribution neutralOpinionDist = new NormalDistribution(rand.nextLong(), 0,
+                    1000);
+            NormalDistribution againstOpinionDist = new NormalDistribution(rand.nextLong(), 500,
+                    50);
 
             for (int i = 0; i < pro; i++) {
                 mps[i] = new MP(proOpinionDist.nextIntValue(), 1, stubborn);

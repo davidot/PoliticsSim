@@ -44,24 +44,35 @@ public class LowerChambers {
     }
 
     public void runRound() {
-        MP mp = getBestSpeaker(startSide);
-        speakToOthers(mp);
+        MP first = getBestSpeaker(startSide);
+        MP other = getBestSpeaker(secondSide);
 
-        mp = getBestSpeaker(secondSide);
-        speakToOthers(mp);
+        if (first != null) {
+            spoken.add(first);
+        }
+
+        if (other != null) {
+            spoken.add(other);
+        }
+
+        int totalInfluence = calcInfluence(first) + calcInfluence(other);
+
+        speakToOthers(totalInfluence, first, other);
     }
 
-    private void speakToOthers(MP mp) {
-        if (mp != null) {
-            spoken.add(mp);
-            int influence = mp.speak() * mp.vote().opinionModifier();
-            // System.out.println("I:" + influence);
-            for(int j = 0; j < NUM_MP; j++) {
-                if (mps[j] != mp) {
-                    mps[j].listen(influence);
-                }
+    private void speakToOthers(int influence, MP first, MP other) {
+        for(int j = 0; j < NUM_MP; j++) {
+            if (mps[j] != first && mps[j] != other) {
+                mps[j].listen(influence);
             }
         }
+    }
+
+    private int calcInfluence(MP mp) {
+        if (mp == null) {
+            return 0;
+        }
+        return mp.speak() * mp.vote().opinionModifier();
     }
 
     private MP getBestSpeaker(VoteOptions side) {
@@ -124,12 +135,30 @@ public class LowerChambers {
     }
 
     public static void main(String[] args) {
-        // new Results(Setup.getStubbornMinority(75, 300.0, 50.0, 0.8, -500, 100, 1.0))
-        //         .runAll();
-        // new Results(Setup.getDefaultConsistency()).runBothToFile("consistency");
-        for(int i = 0; i < 25; i++) {
-            new Results(Setup.getRootNTest(i,0, 1.0)).runBothToFile("root-n-" + i + "-pro-");
-            // new Results(Setup.getRootNTest(0,i, 1.0)).runBothToFile("root-n-" + i + "-aga-");
+//        new Results(Setup.getDefaultConsistency()).runToFile("consistency", true, "proving");
+//        for (int i = 0; i < 10; i++) {
+//            new Results(Setup.getDefault()).runToFile("normal-disted-opinion-" + i, true,
+//                    "proving\\");
+//        }
+//        for(int i = 1; i < 25; i++) {
+//            new Results(new Setup.RootNTestSetup(i,0, 1.0)).runToFile("root-n-" + i +
+//                    "-accepting-", "rootN");
+//            new Results(new Setup.RootNTestSetup(i,0)).runToFile("root-n-" + i +
+//                    "-stubbornN-", "rootN");
+//        }
+
+        for (int i = 5; i <= 75; i+= 5) {
+            new Results(new Setup.StubbornMinority(i, 400.0, 150.0, -600.0, 100.0,
+                    1.0, 0.1)).runToFile("stub-minor-" + i, "stubMin");
         }
+        for (int i = 51; i < 60; i++) {
+            if (i % 5 == 0) {
+                //already done in the loop above
+                continue;
+            }
+            new Results(new Setup.StubbornMinority(i, 200.0, 200.0, -600.0, 100.0,
+                    1.0, 0.1)).runToFile("stub-minor-" + i, "stubMin");
+        }
+
     }
 }

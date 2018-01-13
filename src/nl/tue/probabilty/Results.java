@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.DoubleSummaryStatistics;
 import java.util.List;
@@ -55,8 +54,6 @@ public class Results {
             result = lc.getCurrentResult();
             data[run][i] = result.getVotes();
             finalVotes[run][i] = result.getTotalVote();
-//            System.out.println("Result for run " + run + ", round= " + i + " : "
-//                    + Arrays.toString(data[run][i]));
         }
 
     }
@@ -69,30 +66,59 @@ public class Results {
             }
         }
         System.out.println("\n\n\n");
-        System.out.println(analyzeResults());
+        System.out.println(resultsToString());
     }
 
-    public void runBothToFile(String name) {
-        int file = -1;
-        String fileName = "poli-run-" + name;
-        while(new File(fileName + "pro.txt").exists() && ++file < 100) {
-            fileName = "poli-run-" + name + "-run-" + file;
+    public void runToFile(String name) {
+        runToFile(name, false);
+    }
+
+    public void runToFile(String name, String baseDir) {
+        runToFile(name, false, baseDir);
+    }
+
+    public void runToFile(String name, boolean both) {
+        runToFile(name, both, ".");
+    }
+
+    public void runToFile(String name, boolean both, String baseDir) {
+        File dir = new File(baseDir);
+        if (!dir.exists()) {
+            if (!dir.mkdirs()) {
+                System.out.println("Could not create directory");
+            }
+        }
+        if (!dir.isDirectory()) {
+            System.out.println(dir.getAbsolutePath());
+            dir = new File(".");
+        }
+
+        int file = 0;
+        String fileName = "run-" + file + "-" + name;
+        while(new File(dir, fileName + (both ? "-pro-starts" : "") + ".txt").exists() && ++file <
+                100) {
+            fileName = "run-" +file + "-" + name;
         }
 
         LowerChambers.setStartSide(VoteOptions.PRO);
         for (int i = 0; i < runs; i++) {
             executeRun(i);
             if (i % 1000 == 0) {
-                System.out.println("Did " + i + " runs PRO");
+                System.out.println("Did " + i + " runs");
             }
         }
 
-        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName + "pro.txt"))) {
-            writer.write(analyzeResults());
+        try (BufferedWriter writer = Files.newBufferedWriter(new File(dir, fileName +
+                (both ? "-pro-starts" : "") + ".txt").toPath())) {
+            writer.write(resultsToString());
         } catch(IOException e) {
             e.printStackTrace();
         }
 
+        if (!both) {
+            // we only test one side
+            return;
+        }
 
         //empty data
         createStorage();
@@ -104,17 +130,18 @@ public class Results {
             }
         }
 
-        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName + "against.txt"))) {
-            writer.write(analyzeResults());
+        try (BufferedWriter writer = Files.newBufferedWriter(new File(dir, fileName +
+                "-against-starts" + ".txt").toPath())) {
+            writer.write(resultsToString());
         } catch(IOException e) {
             e.printStackTrace();
         }
 
 
-        System.out.println("Saved to " + fileName + "[PRO|AGAINST].txt");
+        System.out.println("Saved to " + fileName + ".txt");
     }
 
-    private String analyzeResults() {
+    private String resultsToString() {
         double[][] medians = new double[DATA_PER_ROUND][TOTAL_MEASURE_POINTS];
         double[][] q1s = new double[DATA_PER_ROUND][TOTAL_MEASURE_POINTS];
         double[][] q3s = new double[DATA_PER_ROUND][TOTAL_MEASURE_POINTS];

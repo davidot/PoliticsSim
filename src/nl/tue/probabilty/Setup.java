@@ -4,6 +4,8 @@ import java.util.Random;
 
 public abstract class Setup {
 
+    public abstract MP[] generateMPs(int run);
+
     public static Setup getDefault() {
         return new Setup() {
             @Override
@@ -35,15 +37,8 @@ public abstract class Setup {
         };
     }
 
-    public abstract MP[] generateMPs(int run);
 
-
-    public static Setup getStubbornMinority(int minSize, double minMean, double minVar, double
-            minStub, double majMean, double majVar, double majStub) {
-        return new StubbornMinority(minSize, majMean, majVar, minMean, minVar, majStub, minStub);
-    }
-
-    private static class StubbornMinority extends Setup {
+    public static class StubbornMinority extends Setup {
 
         private final int minoritySize;
 
@@ -89,11 +84,7 @@ public abstract class Setup {
         }
     }
 
-    public static Setup getNormalOpSetup(double mean, double var, int speech, double stub) {
-        return new NormalOpNoSpeechOrStub(mean, var, speech, stub);
-    }
-
-    private static class NormalOpNoSpeechOrStub extends Setup {
+    public static class NormalOpNoSpeechOrStub extends Setup {
 
         private final int speech;
         private final double stub;
@@ -120,45 +111,63 @@ public abstract class Setup {
         }
     }
 
-
-    public static Setup getRootNTest(int pro, int against, double stubborn) {
-        return new RootNTestSetup(pro, against, stubborn);
-    }
-
-    private static class RootNTestSetup extends Setup {
+    public static class RootNTestSetup extends Setup {
         private final int pro;
         private final int against;
         private final double stubborn;
+        private NormalDistribution stubNorm;
+
+        public RootNTestSetup(int pro, int against) {
+            this.pro = pro;
+            this.against = against;
+            this.stubborn = 1.0;
+
+        }
 
         public RootNTestSetup(int pro, int against, double stubborn) {
             this.pro = pro;
             this.against = against;
             this.stubborn = stubborn;
+            this.stubNorm = null;
         }
 
         @Override
         public MP[] generateMPs(int run) {
             MP[] mps = new MP[LowerChambers.NUM_MP];
             Random rand = new Random();
+
+            this.stubNorm = new NormalDistribution(rand.nextLong(), 0.7, 0.3);
+
             NormalDistribution proOpinionDist = new NormalDistribution(rand.nextLong(), 500, 50);
             NormalDistribution neutralOpinionDist = new NormalDistribution(rand.nextLong(), 0,
                     1000);
             NormalDistribution againstOpinionDist = new NormalDistribution(rand.nextLong(), 500,
                     50);
+            UniformIntDistribution speech = new UniformIntDistribution(rand.nextLong(), 1, 5);
+
+
 
             for (int i = 0; i < pro; i++) {
-                mps[i] = new MP(proOpinionDist.nextIntValue(), 1, stubborn);
+                mps[i] = new MP(proOpinionDist.nextIntValue(), speech.nextValue(), getStubborn());
             }
 
             for (int i = pro; i < pro + against; i++) {
-                mps[i] = new MP(againstOpinionDist.nextIntValue(), 1, stubborn);
+                mps[i] = new MP(againstOpinionDist.nextIntValue(), speech.nextValue(), getStubborn());
             }
 
             for (int i = pro + against; i < LowerChambers.NUM_MP; i++) {
-                mps[i] = new MP(neutralOpinionDist.nextIntValue(), 1, stubborn);
+                mps[i] = new MP(neutralOpinionDist.nextIntValue(), speech.nextValue(), getStubborn());
             }
 
             return mps;
+        }
+
+        private double getStubborn() {
+            if (stubNorm != null) {
+                return stubNorm.nextValue();
+            } else {
+                return stubborn;
+            }
         }
     }
 

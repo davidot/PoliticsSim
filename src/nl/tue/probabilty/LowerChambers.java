@@ -15,7 +15,6 @@ public class LowerChambers {
 
     private final List<MP> spoken = new ArrayList<>(SPEAKERS_PER_SIDE * 2);
 
-
     public LowerChambers(Setup setup, int run) {
         mps = setup.generateMPs(run);
     }
@@ -142,10 +141,10 @@ public class LowerChambers {
         }
 
         for(int i = 1; i < 25; i++) {
-            new Results(new Setup.RootNTestSetup(i,0, 1.0)).runToFile("root-n-" + i +
-                    "-accepting-", "rootN");
-            new Results(new Setup.RootNTestSetup(i,0)).runToFile("root-n-" + i +
-                    "-normStubb-", "rootN");
+            new Results(new Setup.RootNTestSetup(i,0, 1.0)).runToFile("root-n-" +
+                    "-accepting-" + i, "rootN");
+            new Results(new Setup.RootNTestSetup(i,0)).runToFile("root-n-" +
+                    "-normStubb-" + i, "rootN");
         }
 
 

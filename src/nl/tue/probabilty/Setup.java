@@ -11,11 +11,13 @@ public abstract class Setup {
             @Override
             public MP[] generateMPs(int run) {
                 MP[] mps = new MP[LowerChambers.NUM_MP];
-                Random rand = new Random();
-                NormalDistribution neutralOpinionDist = new NormalDistribution(rand.nextLong(), 0,
-                        1000);
+
                 for (int i = 0; i < LowerChambers.NUM_MP; i++) {
-                    mps[i] = new MP(neutralOpinionDist.nextIntValue(), 1.0, 1.0);
+                    int opinion = fullNormalDist.nextIntValue();
+                    while (Math.abs(opinion) > MP.OPINION_MAX) {
+                        opinion = fullNormalDist.nextIntValue();
+                    }
+                    mps[i] = new MP(opinion, 1.0, 1.0);
                 }
                 return mps;
             }
@@ -136,27 +138,25 @@ public abstract class Setup {
             MP[] mps = new MP[LowerChambers.NUM_MP];
             Random rand = new Random();
 
-            this.stubNorm = new NormalDistribution(rand.nextLong(), 0.7, 0.3);
+            this.stubNorm = new NormalDistribution(rand.nextLong(), 0.6, 0.15);
 
-            NormalDistribution proOpinionDist = new NormalDistribution(rand.nextLong(), 500, 50);
-            NormalDistribution neutralOpinionDist = new NormalDistribution(rand.nextLong(), 0,
-                    1000);
-            NormalDistribution againstOpinionDist = new NormalDistribution(rand.nextLong(), 500,
-                    50);
+//            NormalDistribution proOpinionDist = new NormalDistribution(rand.nextLong(), 750, 50);
+//            NormalDistribution againstOpinionDist = new NormalDistribution(rand.nextLong(), 750,
+//                    50);
             NormalDistribution speech = new NormalDistribution(rand.nextLong(), 0.5, 0.25);
 
 
 
             for (int i = 0; i < pro; i++) {
-                mps[i] = new MP(proOpinionDist.nextIntValue(), speech.nextValue(), getStubborn());
+                mps[i] = new MP(1000, speech.nextValue(), getStubborn());
             }
 
             for (int i = pro; i < pro + against; i++) {
-                mps[i] = new MP(againstOpinionDist.nextIntValue(), speech.nextValue(), getStubborn());
+                mps[i] = new MP(-1000, speech.nextValue(), getStubborn());
             }
 
             for (int i = pro + against; i < LowerChambers.NUM_MP; i++) {
-                mps[i] = new MP(neutralOpinionDist.nextIntValue(), speech.nextValue(), getStubborn());
+                mps[i] = new MP(fullNormalDist.nextIntValue(), speech.nextValue(), getStubborn());
             }
 
             return mps;
@@ -171,28 +171,48 @@ public abstract class Setup {
         }
     }
 
+    private static final NormalDistribution fullNormalDist = new FullNormalDistribution();
+
+    private static class FullNormalDistribution extends NormalDistribution {
+
+        public FullNormalDistribution() {
+            super(0, 375);
+        }
+
+        @Override
+        public double nextValue() {
+            double val;
+
+            do {
+                val = super.nextValue();
+            } while (val > 1000.0);
+
+            return super.nextValue();
+        }
+    }
+
     public static class NormalDistribution {
 
         private Random rand;
         private final double mean;
 
-        private final double variance;
+        private final double stdDeviation;
 
-        public NormalDistribution(double mean, double variance) {
+        public NormalDistribution(double mean, double stdDeviation) {
             this.rand = new Random();
             this.mean = mean;
-            this.variance = variance;
+            this.stdDeviation = stdDeviation;
         }
 
-        public NormalDistribution(long seed, double mean, double variance) {
+        public NormalDistribution(long seed, double mean, double stdDeviation) {
             this.rand = new Random(seed);
             this.mean = mean;
-            this.variance = variance;
+            this.stdDeviation = stdDeviation;
         }
 
         public double nextValue() {
-            //next normal value with mean and variance
-            return rand.nextGaussian() * variance + mean;
+            //next normal value with mean and stdDeviation
+            return rand.nextGaussian() * stdDeviation + mean;
         }
 
         public int nextIntValue() {
@@ -200,6 +220,7 @@ public abstract class Setup {
         }
 
     }
+
     public static class UniformIntDistribution {
 
         private Random rand;

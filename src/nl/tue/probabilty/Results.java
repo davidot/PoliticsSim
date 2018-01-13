@@ -103,9 +103,6 @@ public class Results {
         LowerChambers.setStartSide(VoteOptions.PRO);
         for (int i = 0; i < runs; i++) {
             executeRun(i);
-            if (i % 1000 == 0) {
-                System.out.println("Did " + i + " runs");
-            }
         }
 
         try (BufferedWriter writer = Files.newBufferedWriter(new File(dir, fileName +
@@ -116,6 +113,7 @@ public class Results {
         }
 
         if (!both) {
+            System.out.println("Saved to " + fileName + ".txt");
             // we only test one side
             return;
         }
@@ -125,9 +123,6 @@ public class Results {
         LowerChambers.setStartSide(VoteOptions.AGAINST);
         for (int i = 0; i < runs; i++) {
             executeRun(i);
-            if (i % 1000 == 0) {
-                System.out.println("Did " + i + " runs AGAINST");
-            }
         }
 
         try (BufferedWriter writer = Files.newBufferedWriter(new File(dir, fileName +

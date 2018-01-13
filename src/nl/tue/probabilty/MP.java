@@ -6,23 +6,18 @@ public class MP {
     public static final double OPINION_DIV = OPINION_MAX / 10.0;
     public static final int NEUTRAL_MAX = 100;
 
-    public static final int SPEECH_MAX = 100;
-
-    //todo choose value
-    private static final int SPEECH_CONSTANT = 90;
-
     private int opinion;
-    private final int speechSkill;
+    private final double speechSkill;
     private final double stubbornness;
 
-    public MP(int opinion, int speechSkill, double stubbornness) {
+    public MP(int opinion, double speechSkill, double stubbornness) {
         this.opinion = opinion;
         checkOpinionBounds();
 
-        if (speechSkill < 1) {
-            this.speechSkill = 1;
-        } else if (speechSkill > SPEECH_MAX) {
-            this.speechSkill = SPEECH_MAX;
+        if (speechSkill < 0.0) {
+            this.speechSkill = 0.0;
+        } else if (speechSkill > 1.0) {
+            this.speechSkill = 1.0;
         } else {
             this.speechSkill = speechSkill;
         }
@@ -69,9 +64,9 @@ public class MP {
 
     public int speak() {
         if (getAbsoluteOpinion() > OPINION_MAX / 2) {
-            return speechSkill * SPEECH_CONSTANT;
+            return (int) (getAbsoluteOpinion() / 5 * speechSkill);
         } else {
-            return (int)(calcSpeechMod() * speechSkill * SPEECH_CONSTANT);
+            return getAbsoluteOpinion() / 5 * (int)(calcSpeechMod() * speechSkill);
         }
     }
 

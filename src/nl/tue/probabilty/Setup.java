@@ -15,7 +15,7 @@ public abstract class Setup {
                 NormalDistribution neutralOpinionDist = new NormalDistribution(rand.nextLong(), 0,
                         1000);
                 for (int i = 0; i < LowerChambers.NUM_MP; i++) {
-                    mps[i] = new MP(neutralOpinionDist.nextIntValue(), 1, 1.0);
+                    mps[i] = new MP(neutralOpinionDist.nextIntValue(), 1.0, 1.0);
                 }
                 return mps;
             }
@@ -28,9 +28,9 @@ public abstract class Setup {
             public MP[] generateMPs(int run) {
                 MP[] mps = new MP[LowerChambers.NUM_MP];
                 for (int i = 0; i < LowerChambers.NUM_MP; i+= 3) {
-                    mps[i] = new MP(500, 1, 1.0);
-                    mps[i + 1] = new MP(0, 1, 1.0);
-                    mps[i + 2] = new MP(-500, 1, 1.0);
+                    mps[i] = new MP(500, 1.0, 1.0);
+                    mps[i + 1] = new MP(0, 1.0, 1.0);
+                    mps[i + 2] = new MP(-500, 1.0, 1.0);
                 }
                 return mps;
             }
@@ -72,11 +72,11 @@ public abstract class Setup {
             NormalDistribution normalMin = new NormalDistribution(rand.nextLong(), meanMin, varMin);
 
             for (int i = 0; i < minoritySize; i++) {
-                mps[i] = new MP(normalMin.nextIntValue(), 1, stubMin);
+                mps[i] = new MP(normalMin.nextIntValue(), 1.0, stubMin);
             }
 
             for (int i = minoritySize; i < LowerChambers.NUM_MP; i++) {
-                mps[i] = new MP(normalMaj.nextIntValue(), 1, stubMaj);
+                mps[i] = new MP(normalMaj.nextIntValue(), 1.0, stubMaj);
             }
 
 
@@ -86,12 +86,12 @@ public abstract class Setup {
 
     public static class NormalOpNoSpeechOrStub extends Setup {
 
-        private final int speech;
+        private final double speech;
         private final double stub;
         private final double var;
         private final double mean;
 
-        public NormalOpNoSpeechOrStub(double mean, double var, int speech, double stub) {
+        public NormalOpNoSpeechOrStub(double mean, double var, double speech, double stub) {
             this.speech = speech;
             this.stub = stub;
             this.var = var;
@@ -143,7 +143,7 @@ public abstract class Setup {
                     1000);
             NormalDistribution againstOpinionDist = new NormalDistribution(rand.nextLong(), 500,
                     50);
-            UniformIntDistribution speech = new UniformIntDistribution(rand.nextLong(), 1, 5);
+            NormalDistribution speech = new NormalDistribution(rand.nextLong(), 0.5, 0.25);
 
 
 

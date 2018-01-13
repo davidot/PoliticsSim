@@ -25,8 +25,7 @@ public class LowerChambers {
         //initialize the mps
         mps = new MP[NUM_MP];
         for(int i = 0; i < NUM_MP; i++) {
-            mps[i] = new MP(rand.nextInt(MP.OPINION_MAX/2) - MP.OPINION_MAX/4 - 1, rand.nextInt
-                    (5) + 1, 1.0);
+            mps[i] = new MP(rand.nextInt(MP.OPINION_MAX/2) - MP.OPINION_MAX/4 - 1, rand.nextDouble(), 1.0);
         }
 
         System.out.println("Initial setup state:");
@@ -135,28 +134,32 @@ public class LowerChambers {
     }
 
     public static void main(String[] args) {
-//        new Results(Setup.getDefaultConsistency()).runToFile("consistency", true, "proving");
-//        for (int i = 0; i < 10; i++) {
-//            new Results(Setup.getDefault()).runToFile("normal-disted-opinion-" + i, true,
-//                    "proving\\");
-//        }
-//        for(int i = 1; i < 25; i++) {
-//            new Results(new Setup.RootNTestSetup(i,0, 1.0)).runToFile("root-n-" + i +
-//                    "-accepting-", "rootN");
-//            new Results(new Setup.RootNTestSetup(i,0)).runToFile("root-n-" + i +
-//                    "-stubbornN-", "rootN");
-//        }
+        new Results(Setup.getDefaultConsistency()).runToFile("consistency", true, "proving");
+
+        for (int i = 0; i < 10; i++) {
+            new Results(Setup.getDefault()).runToFile("normal-disted-opinion-" + i, true,
+                    "proving");
+        }
+
+        for(int i = 1; i < 25; i++) {
+            new Results(new Setup.RootNTestSetup(i,0, 1.0)).runToFile("root-n-" + i +
+                    "-accepting-", "rootN");
+            new Results(new Setup.RootNTestSetup(i,0)).runToFile("root-n-" + i +
+                    "-normStubb-", "rootN");
+        }
+
 
         for (int i = 5; i <= 75; i+= 5) {
             new Results(new Setup.StubbornMinority(i, 400.0, 150.0, -600.0, 100.0,
                     1.0, 0.1)).runToFile("stub-minor-" + i, "stubMin");
         }
+
         for (int i = 51; i < 60; i++) {
             if (i % 5 == 0) {
                 //already done in the loop above
                 continue;
             }
-            new Results(new Setup.StubbornMinority(i, 200.0, 200.0, -600.0, 100.0,
+            new Results(new Setup.StubbornMinority(i, 400.0, 150.0, -600.0, 100.0,
                     1.0, 0.1)).runToFile("stub-minor-" + i, "stubMin");
         }
 

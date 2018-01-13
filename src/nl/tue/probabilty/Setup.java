@@ -148,11 +148,13 @@ public abstract class Setup {
 
 
             for (int i = 0; i < pro; i++) {
-                mps[i] = new MP(1000, speech.nextValue(), getStubborn());
+                //add pro
+                mps[i] = new MP(800, speech.nextValue(), getStubborn());
             }
 
             for (int i = pro; i < pro + against; i++) {
-                mps[i] = new MP(-1000, speech.nextValue(), getStubborn());
+                //add against
+                mps[i] = new MP(-800, speech.nextValue(), getStubborn());
             }
 
             for (int i = pro + against; i < LowerChambers.NUM_MP; i++) {
@@ -176,7 +178,7 @@ public abstract class Setup {
     private static class FullNormalDistribution extends NormalDistribution {
 
         public FullNormalDistribution() {
-            super(0, 375);
+            super(0, 500);
         }
 
         @Override

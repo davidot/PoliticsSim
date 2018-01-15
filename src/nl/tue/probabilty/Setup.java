@@ -173,7 +173,7 @@ public abstract class Setup {
         }
     }
 
-    public static final TweedeKamerSetup.Party[] roken = new TweedeKamerSetup.Party[] {
+    /*public static final TweedeKamerSetup.Party[] roken = new TweedeKamerSetup.Party[] {
             new TweedeKamerSetup.Party(41, -400, 200, 1.0), //VVD
             new TweedeKamerSetup.Party(38, 400, 200, 1.0), //PVDA
             new TweedeKamerSetup.Party(15, -400, 200, 1.0), //PVV
@@ -201,22 +201,54 @@ public abstract class Setup {
             new TweedeKamerSetup.Party(2, -400, 200, 1.0), //50PLUS
     };
 
+    */
+
+    public static final TweedeKamerSetup.Party[] zondag = new TweedeKamerSetup.Party[] {
+            new TweedeKamerSetup.Party(41, 800,  200, 1.0, 1.0), //VVD
+            new TweedeKamerSetup.Party(38, 600,  200, 1.0, 1.0), //PVDA
+            new TweedeKamerSetup.Party(15, -750, 200, 1.0, 0.5), //PVV
+            new TweedeKamerSetup.Party(15, -1000, 200, 0.1, 0.1), //SP
+            new TweedeKamerSetup.Party(13, -1000, 200, 0.1, 0.1), //CDA
+            new TweedeKamerSetup.Party(12, 700,  200, 1.0, 1.0), //D66
+            new TweedeKamerSetup.Party(5,  -800, 200, 1.0, 1.0), //CU
+            new TweedeKamerSetup.Party(4,  700,  200, 1.0, 1.0), //GL
+            new TweedeKamerSetup.Party(3,  -1000, 200, 0.1, 0.0), //SGP
+            new TweedeKamerSetup.Party(2,  400,  200, 1.0, 1.0), //PVDD
+            new TweedeKamerSetup.Party(2,  400,  200, 1.0, 1.0), //50PLUS
+    };
+
+    public static final TweedeKamerSetup.Party[] roken = new TweedeKamerSetup.Party[] {
+            new TweedeKamerSetup.Party(41, -600, 100, 1.0, 1.0), //VVD
+            new TweedeKamerSetup.Party(38, 600, 100, 1.0, 1.0), //PVDA
+            new TweedeKamerSetup.Party(15, -600, 100, 1.0, 1.0), //PVV
+            new TweedeKamerSetup.Party(15, -500, 100, 1.0, 1.0), //SP
+            new TweedeKamerSetup.Party(13, 400, 200, 1.0, 1.0), //CDA
+            new TweedeKamerSetup.Party(12, 500, 100, 1.0, 1.0), //D66
+            new TweedeKamerSetup.Party(5, 400, 100, 1.0, 1.0), //CU
+            new TweedeKamerSetup.Party(4, 300, 200, 1.0, 1.0), //GL
+            new TweedeKamerSetup.Party(3, 300, 200, 1.0, 1.0), //SGP
+            new TweedeKamerSetup.Party(2, 300, 200, 1.0, 1.0), //PVDD
+            new TweedeKamerSetup.Party(2, 300, 200, 1.0, 1.0), //50PLUS
+    };
+
     public static class TweedeKamerSetup extends Setup {
 
         private static class Party {
             private final int size;
             private final NormalDistribution dist;
             private final double stubb;
+            private final double speech;
 
-            private Party(int size, int opinion, int variance, double stubb) {
+            private Party(int size, int opinion, int variance, double stubb, double speech) {
                 this.size = size;
                 this.stubb = stubb;
+                this.speech = speech;
                 dist = new NormalDistribution(opinion, variance);
             }
 
             private int generate(MP[] mps, int offset) {
                 for(int i = offset; i < offset + size; i++) {
-                    mps[i] = new MP(dist.nextIntValue(), 1.0, stubb);
+                    mps[i] = new MP(dist.nextIntValue(), speech, stubb);
                 }
                 return size;
             }

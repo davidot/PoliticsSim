@@ -166,6 +166,7 @@ public class LowerChambers {
             new Results(new Setup.StubbornMinority(i, 400.0, 200.0, -400.0, 200.0,
                     1.0, 1.0)).runToFile("against-" + i, "tweedeKamer4");
         }
-
+        new Results(new Setup.TweedeKamerSetup(Setup.zondag)).runToFile("zondag", "tweedeKamer");
+        new Results(new Setup.TweedeKamerSetup(Setup.roken)).runToFile("roken", "tweedeKamer");
     }
 }

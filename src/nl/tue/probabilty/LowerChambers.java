@@ -162,5 +162,10 @@ public class LowerChambers {
                     1.0, 0.1)).runToFile("stub-minor-" + i, "stubMin");
         }
 
+        for (int i = 0; i <= 75; i++) {
+            new Results(new Setup.StubbornMinority(i, 400.0, 200.0, -400.0, 200.0,
+                    1.0, 1.0)).runToFile("against-" + i, "tweedeKamer4");
+        }
+
     }
 }
